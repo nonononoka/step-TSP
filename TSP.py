@@ -26,9 +26,9 @@ def solve(cities):
         path[i]=i #次に進む点を保存しておく辞書。path[1]=2だったら、1→2の順番で進む。
         for k in range(i,i+N): #iからiに戻るまでに経由する点をi,i+1,i+2・・の順に増やしていく。 
             k=k%N
-            min_path=dist[i][k]+dist[k][path[i]]
             point=i #kを入れる前の点がpoint
             l=i
+            min_path=dist[i][k]+dist[k][path[i]]
             while not path[l]==i: #再びiに辿り着くまで、kを次に入れて最小の経路になるようなpointを探す。
                 if dist[l][k]+dist[k][path[l]]-dist[l][path[l]]<min_path:
                     min_path=dist[l][k]+dist[k][path[l]]-dist[l][path[l]]
@@ -68,4 +68,10 @@ if __name__ == '__main__':
     
     
 
-
+#各変数の型
+# dist:二次元配列 どこも経由しない場合(直接i→jに行く)場合の経路長を保存
+# path_list:リスト iからstartした時の経路を保存する。リストの中身は辞書
+# ans:リスト iからstartした時の経路長を保存
+# path:辞書 1:2,2:3,3:4・・・のようにvalueがkeyの次の点になっている。
+# min_path:float i→k→jの経路長-i→jの経路長
+# point:float kを次に入れる点
