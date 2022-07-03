@@ -2,7 +2,7 @@ from common import  read_input,format_tour, read_input
 
 import TSP
 
-CHALLENGES = 6
+CHALLENGES = 2
 
 
 def generate_sample_output():

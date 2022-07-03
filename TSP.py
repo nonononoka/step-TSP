@@ -10,10 +10,11 @@ def two_three_opt(tour, dist_list,distance):
     while True:
         count = 0
         for i in range(N - 2):
-            # print(i)
+            
+            
             for j in range(i + 2, N - 2):
                 for k in range(j + 2, N):
-                    
+                    print(i)
                     
                     A, B, C, D, E, F = tour[i], tour[i + 1], tour[j], tour[j + 1], tour[k], tour[(k + 1) % N]
                     d=[0]*8
@@ -135,7 +136,10 @@ def solve(cities):
     while not tmp_path[now]==start: #ans_listに経路を追加していく。
         ans_list.append(tmp_path[now])
         now=tmp_path[now]
-    
+    # ans_list=[]
+    # for i in range(N):
+    #     ans_list.append(i)
+        
     ans_list=two_three_opt(ans_list,dist,min(ans))
     #ここから最適化していく。
     
