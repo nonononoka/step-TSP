@@ -4,6 +4,86 @@ import math
 
 from common import print_tour, read_input,format_tour, read_input
 
+def two_three_opt(tour, dist_list,distance):
+    N = len(tour)
+
+    while True:
+        count = 0
+        for i in range(N - 2):
+            # print(i)
+            for j in range(i + 2, N - 2):
+                for k in range(j + 2, N):
+                    
+                    
+                    A, B, C, D, E, F = tour[i], tour[i + 1], tour[j], tour[j + 1], tour[k], tour[(k + 1) % N]
+                    d=[0]*8
+                    d[0] = dist_list[A][B] + dist_list[C][D] + dist_list[E][F]
+                    # d[0]が現在の繋ぎ方の場合の距離
+                    
+                    #two_opt
+                    d[1] = dist_list[A][C] + dist_list[B][D] + dist_list[E][F] 
+                    d[2] = dist_list[A][B] + dist_list[C][E] + dist_list[D][F] 
+                    d[3] = dist_list[F][B] + dist_list[C][D] + dist_list[E][A] 
+                    
+                    #three_opt　
+                    d[4] = dist_list[A][E] + dist_list[D][B] + dist_list[C][F]
+                    d[5] = dist_list[A][D] + dist_list[E][C] + dist_list[B][F]
+                    d[6] = dist_list[A][D] + dist_list[E][B] + dist_list[C][F] 
+                    d[7] = dist_list[A][C] + dist_list[E][B] + dist_list[F][D]
+                    min=0
+                    for l in range(8):
+                        if d[l]<d[min]:
+                            min=l
+                    # print(i,j,k,min)
+                    if min==0:
+                        continue
+                    
+                    #2_optの場合の繋ぎかえ
+                    if min==1: #新しい繋ぎ方の方が短い場合、tour[i + 1]からtour[j]までを逆順にする
+                        tour[i + 1 : j + 1] = reversed(tour[i + 1 : j + 1])
+                        distance -= d[0]-d[1]
+                        count += 1
+                    elif min==2:
+                        tour[j + 1 : k + 1] = reversed(tour[j + 1 : k + 1])
+                        distance -= d[0]-d[2]
+                        count += 1
+                    elif min==3:    
+                        tour[i + 1 : k + 1] = reversed(tour[i + 1 : k + 1])
+                        distance -= d[0]-d[3]
+                        count += 1
+                    
+                    #3_optの場合の繋ぎかえ
+                    elif min==4:
+                        tmp = list(reversed(tour[ j + 1 : k + 1])) + tour[i + 1 : j + 1]
+                        tour[i + 1 : k + 1] = tmp
+                        distance -= d[0]-d[4]
+                        count += 1
+                        
+                    
+                    elif min==5:
+                        tmp = tour[j + 1 : k + 1] + list(reversed(tour[i + 1 : j + 1]))
+                        tour[i + 1 : k + 1] = tmp
+                        distance -= d[0]-d[5]
+                        count += 1
+                    
+                    elif min==6:
+                        tmp = tour[j + 1 : k + 1] + tour[i + 1 : j + 1]
+                        tour[i + 1 : k + 1] = tmp
+                        distance -= d[0]-d[6]
+                        count += 1
+                        
+                    elif min==7:
+                        tmp = list(reversed(tour[j + 1 : k + 1])) + list(reversed(tour[i + 1 : j + 1]))
+                        tour[i + 1 : k + 1] = tmp
+                        distance -= d[0]-d[6]
+                        count += 1
+
+        if count == 0:
+            #これ以上距離が短くならなかったら
+            break
+
+    return tour
+
 
 def distance(city1, city2):
     return math.sqrt((city1[0] - city2[0]) ** 2 + (city1[1] - city2[1]) ** 2)
@@ -44,19 +124,21 @@ def solve(cities):
             path[point]=k 
             
             ans[i]=ans[i]+min_path
-           
         path_list.append(path)
     
     
     start=ans.index(min(ans)) #ansの最小値探す。
     tmp_path=path_list[start] #長さが最小となるような経路の辞書
-   
+    
     now=start
     ans_list=[start]
     while not tmp_path[now]==start: #ans_listに経路を追加していく。
         ans_list.append(tmp_path[now])
         now=tmp_path[now]
-        
+    
+    ans_list=two_three_opt(ans_list,dist,min(ans))
+    #ここから最適化していく。
+    
     return ans_list
     
 
