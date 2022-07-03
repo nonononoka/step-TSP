@@ -63,18 +63,14 @@ vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
     vector<double> ans(N, 0.0);
     for (int i = 0; i < N; i++)
     {
-        // cout << i << endl;
-        cout << i << endl;
         map<int, int> path;
         path[i] = i;
         for (int k = i; k < i + N; k++)
         {
-            // cout << i << " " << k << " " << endl;
             int tmp_k = k % N;
             int point = i;
             int l = i;
             double min_path = dist_list[i][tmp_k] + dist_list[tmp_k][path[i]];
-            // cout << min_path << endl;
             while (path[l] != i)
             {
 
@@ -108,29 +104,21 @@ vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
         tour.push_back(tmp_path[now]);
         now = tmp_path[now];
     }
-    cout << "とりあえず経路一つできた" << endl;
     return tour;
 }
 
-vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, double distance)
+vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list)
 {
     int N = tour.size();
-    // for (int i = 0; i < N; i++)
-    // {
-    //     cout << tour[i] << endl;
-    // }
-    // cout << N << endl;
     while (true)
     {
         int count = 0;
         for (int i = 0; i < N - 2; i++)
         {
-            // cout << i << endl;
             for (int j = i + 2; j < N - 2; j++)
             {
                 for (int k = j + 2; k < N; k++)
                 {
-                    // cout << i << endl;
                     int A, B, C, D, E, F;
                     A = tour[i];
                     B = tour[i + 1];
@@ -140,7 +128,6 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                     F = tour[(k + 1) % N];
                     vector<double> tmp_tour(8);
                     tmp_tour[0] = dist_list[A][B] + dist_list[C][D] + dist_list[E][F]; //現在の繋ぎ方
-                    // cout << tmp_tour[0] << endl;
                     // two_opt
                     tmp_tour[1] = dist_list[A][C] + dist_list[B][D] + dist_list[E][F];
                     tmp_tour[2] = dist_list[A][B] + dist_list[C][E] + dist_list[D][F];
@@ -152,6 +139,7 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                     tmp_tour[6] = dist_list[A][D] + dist_list[E][B] + dist_list[C][F];
                     tmp_tour[7] = dist_list[A][C] + dist_list[E][B] + dist_list[F][D];
                     int min = 0;
+                    //上の7つの繋ぎ方で一番距離が小さくなるものを選ぶ。
                     for (int l = 0; l < 8; l++)
                     {
                         if (tmp_tour[l] < tmp_tour[min])
@@ -168,19 +156,18 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                     if (min == 1)
                     {
                         tour = change_connection_two(tour, i, j);
-                        distance -= (tmp_tour[0] - tmp_tour[1]);
                         count += 1;
                     }
                     else if (min == 2)
                     {
                         tour = change_connection_two(tour, j, k);
-                        distance -= (tmp_tour[0] - tmp_tour[2]);
+
                         count += 1;
                     }
                     else if (min == 3)
                     {
                         tour = change_connection_two(tour, i, k);
-                        distance -= (tmp_tour[0] - tmp_tour[3]);
+
                         count += 1;
                     }
 
@@ -196,7 +183,7 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                         {
                             tour[m] = tmp_dis_1[m - (i + 1)];
                         }
-                        distance -= (tmp_tour[0] - tmp_tour[4]);
+
                         count += 1;
                     }
 
@@ -211,7 +198,7 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                         {
                             tour[m] = tmp_dis_1[m - (i + 1)];
                         }
-                        distance -= (tmp_tour[0] - tmp_tour[5]);
+
                         count += 1;
                     }
                     else if (min == 6)
@@ -224,7 +211,7 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                         {
                             tour[m] = tmp_dis_1[m - (i + 1)];
                         }
-                        distance -= (tmp_tour[0] - tmp_tour[6]);
+
                         count += 1;
                     }
                     else if (min == 7)
@@ -239,14 +226,13 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                         {
                             tour[m] = tmp_dis_1[m - (i + 1)];
                         }
-                        distance -= (tmp_tour[0] - tmp_tour[7]);
+
                         count += 1;
                     }
-                    // cout << i << " " << count << endl;
                 }
             }
         }
-        if (count == 0)
+        if (count == 0) //これ以上短くできなかったら
         {
             break;
         }
@@ -268,13 +254,8 @@ int main()
     vector<vector<double>> dist_list(N, vector<double>(N, 0.0));
     // tourに出力
     dist_list = dist_list_cal(cities);
-    // for (int i = 0; i < N; i++)
-    // {
-    //     tour.push_back(i);
-    // }
-    tour = nearest_insert(N, dist_list);
-    double distance = 0.0;
-    tour = two_three_opt(tour, dist_list, distance);
+    tour = nearest_insert(N, dist_list);   //とりあえずクロスしないアルゴリズムで経路を一つ出す。
+    tour = two_three_opt(tour, dist_list); //ここから最適化。two_optとthree_optを組み合わせた。
 
     output::print_tour(tour, id);
 

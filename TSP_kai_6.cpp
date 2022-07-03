@@ -98,6 +98,7 @@ vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
         path_list[i] = path;
     }
     auto shortest_dist = min_element(ans.begin(), ans.end());
+    // cout << shortest_dist << endl;
     int start = std::distance(ans.begin(), shortest_dist);
     map<int, int> tmp_path = path_list[start];
     int now = start;
@@ -108,7 +109,7 @@ vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
         tour.push_back(tmp_path[now]);
         now = tmp_path[now];
     }
-    cout << "とりあえず経路一つできた" << endl;
+
     return tour;
 }
 
