@@ -56,15 +56,13 @@ vector<int> subvector(int i, int j, vector<int> tour) // indexがi~jまでのsub
     return tmp_dis;
 }
 
-vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
+pair<vector<int>, double> nearest_insert(int N, vector<vector<double>> dist_list)
 {
 
     vector<map<int, int>> path_list(20);
     vector<double> ans(20, 0.0);
     for (int i = 0; i < 20; i++)
     {
-        // cout << i << endl;
-        cout << i << endl;
         map<int, int> path;
         path[i] = i;
         for (int k = i; k < i + N; k++)
@@ -77,7 +75,6 @@ vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
             // cout << min_path << endl;
             while (path[l] != i)
             {
-
                 if (dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]] < min_path)
                 {
                     min_path = dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]];
@@ -109,18 +106,16 @@ vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
         tour.push_back(tmp_path[now]);
         now = tmp_path[now];
     }
-
-    return tour;
+    pair<vector<int>, double> p(tour, ans[start]);
+    cout << p.second << endl;
+    return p;
 }
 
-vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, double distance)
+pair<vector<int>, double> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, double distance)
 {
+    double first_dist = distance;
+
     int N = tour.size();
-    // for (int i = 0; i < N; i++)
-    // {
-    //     cout << tour[i] << endl;
-    // }
-    // cout << N << endl;
     while (true)
     {
         int count = 0;
@@ -247,12 +242,13 @@ vector<int> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, do
                 }
             }
         }
-        if (count == 0)
+        if (count == 0 || distance < first_dist)
         {
             break;
         }
     }
-    return tour;
+    pair<vector<int>, double> p(tour, distance);
+    return p;
 }
 
 int main()
@@ -269,14 +265,10 @@ int main()
     vector<vector<double>> dist_list(N, vector<double>(N, 0.0));
     // tourに出力
     dist_list = dist_list_cal(cities);
-    // for (int i = 0; i < N; i++)
-    // {
-    //     tour.push_back(i);
-    // }
-    tour = nearest_insert(N, dist_list);
-    double distance = 0.0;
-    tour = two_three_opt(tour, dist_list, distance);
-
+    pair<vector<int>, double> p = nearest_insert(N, dist_list);
+    tour = p.first;
+    double distance = p.second;
+    tour = two_three_opt(tour, dist_list, distance).first;
     output::print_tour(tour, id);
 
     return 0;

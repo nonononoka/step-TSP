@@ -7,7 +7,7 @@ i,j,kの順番と実行時間の関係をグラフにしたものを別で出し
 ・結果
 
 homework2
-
+未完
 
 
 
@@ -16,8 +16,7 @@ homework3
 
 problem1~5についてはTSP_kai.cppで動きます。
 どのファイルを入力するか聞かれるので、ファイル番号を打つとoutputファイルに結果が出力されます。
-problem6については、TSP_kai_6.cppで動きます。
-problem7については、TSP_kai_7.cppで動きます。
+problem6以降については、TSP_kai_big.cppで動きます。
 
 ・考えた方法
 元々、nearest_insert関数で出たtourを出力していましたが、これよりさらに最適化するためtwo_optとthree_optを組み合わせたアルゴリズムを用いました。
