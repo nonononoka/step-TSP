@@ -59,50 +59,57 @@ vector<int> subvector(int i, int j, vector<int> tour) // indexがi~jまでのsub
 vector<int> nearest_insert(int N, vector<vector<double>> dist_list)
 {
 
-    vector<map<int, int>> path_list(N);
-    vector<double> ans(N, 0.0);
-    for (int i = 0; i < N; i++)
+    int start = 0;
+    double short_dist = -1.0;
+    map<int, int> short_path;
+    for (int i = 0; i < N; i++) //始点変える。
     {
         map<int, int> path;
         path[i] = i;
+        double tmp_dist = 0;
         for (int k = i; k < i + N; k++)
         {
-            int tmp_k = k % N;
-            int point = i;
+            int cur_vertex = k % N;
+            int before_cur_vertex = i;
             int l = i;
-            double min_path = dist_list[i][tmp_k] + dist_list[tmp_k][path[i]];
-            while (path[l] != i)
+            double min_path = dist_list[i][cur_vertex] + dist_list[cur_vertex][path[i]];
+            while (true)
             {
 
-                if (dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]] < min_path)
+                if (dist_list[l][cur_vertex] + dist_list[cur_vertex][path[l]] - dist_list[l][path[l]] < min_path)
                 {
-                    min_path = dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]];
-                    point = l;
+                    min_path = dist_list[l][cur_vertex] + dist_list[cur_vertex][path[l]] - dist_list[l][path[l]];
+                    before_cur_vertex = l;
                 }
 
                 l = path[l];
+                if (l == i)
+                {
+                    break;
+                }
             }
-            if (dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]] < min_path)
-            {
-                min_path = dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]];
-                point = l;
-            }
-            path[tmp_k] = path[point];
-            path[point] = tmp_k; // kを入れる前の点がpoint
-            ans[i] = ans[i] + min_path;
+            // pathの入れ替え
+            path[cur_vertex] = path[before_cur_vertex];
+            path[before_cur_vertex] = cur_vertex; // cur_vertexを入れる前の点がbefore_cur_vertex
+            tmp_dist += min_path;
         }
-        path_list[i] = path;
+        if (tmp_dist < short_dist or short_dist < 0)
+        {
+            start = i;
+            short_dist = tmp_dist;
+            short_path = path;
+        }
     }
-    auto shortest_dist = min_element(ans.begin(), ans.end());
-    int start = std::distance(ans.begin(), shortest_dist);
-    map<int, int> tmp_path = path_list[start];
+    // auto shortest_dist = min_element(ans.begin(), ans.end());
+    // int start = std::distance(ans.begin(), shortest_dist);
+    // map<int, int> tmp_path = path_list[start];
     int now = start;
     vector<int> tour;
     tour.push_back(start);
-    while (tmp_path[now] != start)
+    while (short_path[now] != start)
     {
-        tour.push_back(tmp_path[now]);
-        now = tmp_path[now];
+        tour.push_back(short_path[now]);
+        now = short_path[now];
     }
     return tour;
 }

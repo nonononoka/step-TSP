@@ -137,6 +137,7 @@ int main()
     // 1*1~N*Nの正方行列同士の行列積を計算
     for (int i = 1; i < N + 1; i++)
     {
+        cout << i << endl;
         vector<vector<int>> matrix1(i, vector<int>(i, 0));
         vector<vector<int>> matrix2(i, vector<int>(i, 0));
         i_j_k_time[i - 1] = i_j_k_matrix(matrix1, matrix2, i);

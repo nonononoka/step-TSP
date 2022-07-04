@@ -27,17 +27,18 @@ with open ("kij_time.txt") as f:
 with open ("kji_time.txt") as f:
     kji_time=f.readlines()
 
-
+fig = pyplot.figure()
 pyplot.plot(x, ijk_time,color="coral",label="ijk")
 pyplot.plot(x, ikj_time,color="red",label="ikj")
-pyplot.plot(x, jik_time,color="black",label="jik")
-pyplot.plot(x, jki_time,color="gray",label="iki")
-pyplot.plot(x, kij_time,color="yellow",label="kij")
+pyplot.plot(x, jik_time,color="black",label="jik") #ikjとjikがおなじ
+pyplot.plot(x, jki_time,color="gray",label="jki")
+pyplot.plot(x, kij_time,color="yellow",label="kij") #jkiとkijがおなじ
 pyplot.plot(x, kji_time,color="pink",label="kji")
 pyplot.legend()
-pyplot.yscale("log")
+# pyplot.yscale("log")
 
 
 pyplot.xlabel("size")
 pyplot.ylabel("time/seconds")
-pyplot.show()
+pyplot.yticks([0, 0.1, 0.5])
+fig.savefig("hw1_output.png")

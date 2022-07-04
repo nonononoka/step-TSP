@@ -59,74 +59,77 @@ vector<int> subvector(int i, int j, vector<int> tour) // indexがi~jまでのsub
 pair<vector<int>, double> nearest_insert(int N, vector<vector<double>> dist_list)
 {
 
-    int start = 0;
-    double short_dist = -1.0;
-    map<int, int> short_path;
-    for (int i = 0; i < 20; i++) //始点変える。
+    vector<map<int, int>> path_list(10);
+    vector<double> ans(10, 0.0);
+    for (int i = 0; i < 10; i++)
     {
+        cout << i << endl;
         map<int, int> path;
         path[i] = i;
-        double tmp_dist = 0;
         for (int k = i; k < i + N; k++)
         {
-            int cur_vertex = k % N;
-            int before_cur_vertex = i;
+            // cout << i << " " << k << " " << endl;
+            int tmp_k = k % N;
+            int point = i;
             int l = i;
-            double min_path = dist_list[i][cur_vertex] + dist_list[cur_vertex][path[i]];
-            while (true)
+            double min_path = dist_list[i][tmp_k] + dist_list[tmp_k][path[i]];
+            // cout << min_path << endl;
+            while (path[l] != i)
             {
-
-                if (dist_list[l][cur_vertex] + dist_list[cur_vertex][path[l]] - dist_list[l][path[l]] < min_path)
+                if (dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]] < min_path)
                 {
-                    min_path = dist_list[l][cur_vertex] + dist_list[cur_vertex][path[l]] - dist_list[l][path[l]];
-                    before_cur_vertex = l;
+                    min_path = dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]];
+                    point = l;
                 }
 
                 l = path[l];
-                if (l == i)
-                {
-                    break;
-                }
             }
-            // pathの入れ替え
-            path[cur_vertex] = path[before_cur_vertex];
-            path[before_cur_vertex] = cur_vertex; // cur_vertexを入れる前の点がbefore_cur_vertex
-            tmp_dist += min_path;
+            if (dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]] < min_path)
+            {
+                min_path = dist_list[l][tmp_k] + dist_list[tmp_k][path[l]] - dist_list[l][path[l]];
+                point = l;
+            }
+            path[tmp_k] = path[point];
+            path[point] = tmp_k; // kを入れる前の点がpoint
+            ans[i] = ans[i] + min_path;
         }
-        if (tmp_dist < short_dist or short_dist < 0)
-        {
-            start = i;
-            short_dist = tmp_dist;
-            short_path = path;
-        }
+        path_list[i] = path;
     }
+    auto shortest_dist = min_element(ans.begin(), ans.end());
+    // cout << shortest_dist << endl;
+    int start = std::distance(ans.begin(), shortest_dist);
+    map<int, int> tmp_path = path_list[start];
     int now = start;
     vector<int> tour;
     tour.push_back(start);
-    while (short_path[now] != start)
+    while (tmp_path[now] != start)
     {
-        tour.push_back(short_path[now]);
-        now = short_path[now];
+        tour.push_back(tmp_path[now]);
+        now = tmp_path[now];
     }
-    pair<vector<int>, double> p(tour, short_dist);
-    cout << "nearest_insertで" << p.second << "mの経路が出たよ" << endl;
+    pair<vector<int>, double> p(tour, ans[start]);
+    cout << p.second << endl;
     return p;
 }
 
 pair<vector<int>, double> two_three_opt(vector<int> tour, vector<vector<double>> dist_list, double distance)
 {
-    double short_dist = -1.0;
-    vector<int> short_tour;
     int N = tour.size();
-    for (int t = 0; t < 10; t++)
+    vector<double> tmp_distance_list(6);
+    vector<vector<int>> tmp_tour_list(6, vector<int>(N, 0));
+    tmp_distance_list[0] = distance;
+    tmp_tour_list[0] = tour;
+    for (int t = 0; t < 5; t++) // 5回最適化を行う。
     {
         int count = 0;
         for (int i = 0; i < N - 2; i++)
         {
+            cout << i << endl;
             for (int j = i + 2; j < N - 2; j++)
             {
                 for (int k = j + 2; k < N; k++)
                 {
+                    // cout << i << endl;
                     int A, B, C, D, E, F;
                     A = tour[i];
                     B = tour[i + 1];
@@ -238,17 +241,21 @@ pair<vector<int>, double> two_three_opt(vector<int> tour, vector<vector<double>>
                         distance -= (tmp_tour[0] - tmp_tour[7]);
                         count += 1;
                     }
+                    // cout << i << " " << count << endl;
                 }
             }
         }
-
-        if (distance < short_dist || short_dist < 0)
-        {
-            short_dist = distance;
-            short_tour = tour;
-        }
+        tmp_distance_list[t + 1] = distance;
+        tmp_tour_list[t + 1] = tour;
+        // if (count == 0 || distance < first_dist)
+        // {
+        //     break;
+        // }
     }
-    pair<vector<int>, double> p(short_tour, short_dist);
+    auto shortest_dist = min_element(tmp_distance_list.begin(), tmp_distance_list.end());
+    // cout << shortest_dist << endl;
+    int start = std::distance(tmp_distance_list.begin(), shortest_dist);
+    pair<vector<int>, double> p(tmp_tour_list[start], tmp_distance_list[start]);
     return p;
 }
 
@@ -273,4 +280,6 @@ int main()
     tour = p.first;
     cout << p.second << endl;
     output::print_tour(tour, id);
+
+    return 0;
 }
